@@ -79,6 +79,29 @@ export default function CompraBarat() {
   const [page, setPage] = useState(1);
   const productsPerPage = 12;
 
+  useEffect(() => {
+    // Simulando dados de produtos
+    const baseLocation = { lat: -8.8383, lng: 13.2344 }; // Coordenadas de Luanda
+    const mockProducts = Array.from({ length: 50 }, (_, i) => {
+      const coordinates = generateRandomCoordinates(baseLocation, 10);
+      return {
+        id: i + 1,
+        name: `Produto ${i + 1}`,
+        store: `Loja ${i + 1}`,
+        city: ['Luanda', 'Viana', 'Cacuaco', 'Belas'][Math.floor(Math.random() * 4)],
+        price: generateRandomPrice(1000, 1500000),
+        image: `https://picsum.photos/seed/${i + 1}/400/400`,
+        distance: Number((Math.random() * 10).toFixed(1)),
+        phone: '123456789',
+        lat: coordinates.lat,
+        lng: coordinates.lng
+      };
+    });
+
+    setProducts(mockProducts);
+    setIsLoading(false);
+  }, []);
+
   const filteredProducts = useMemo(() => {
     return products.filter(
       (product) =>
