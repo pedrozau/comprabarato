@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link'
 import {
@@ -43,102 +43,145 @@ import {
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import dynamic from 'next/dynamic';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
-const StoreMap = dynamic(() => import('./store-map'), { ssr: false });
+const StoreMap = dynamic(() => import('./store-map'), { 
+  ssr: false,
+  loading: () => <p>Carregando mapa...</p>
+});
 
-// Simulated product data
-const allProducts = [
-  {
-    id: 1,
-    name: 'Smartphone XYZ',
-    price: 999.99,
-    store: 'Loja A',
-    distance: 0.5,
-    lat: -23.55052,
-    lng: -46.633308,
-    image:
-      'data:image/jpeg;base64,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',
-    phone: '+55 11 1234-5678',
-    city: 'São Paulo',
-  },
-  {
-    id: 2,
-    name: 'Laptop ABC',
-    price: 3499.99,
-    store: 'Loja B',
-    distance: 1.2,
-    lat: -23.55782,
-    lng: -46.640309,
-    image: '/placeholder.svg?height=200&width=200',
-    phone: '+55 11 2345-6789',
-    city: 'Rio de Janeiro',
-  },
-  {
-    id: 3,
-    name: 'Tablet 123',
-    price: 1299.99,
-    store: 'Loja C',
-    distance: 0.8,
-    lat: -23.55399,
-    lng: -46.631805,
-    image: '/placeholder.svg?height=200&width=200',
-    phone: '+55 11 3456-7890',
-    city: 'São Paulo',
-  },
-  {
-    id: 4,
-    name: 'Smartwatch Pro',
-    price: 599.99,
-    store: 'Loja D',
-    distance: 1.5,
-    lat: -23.561234,
-    lng: -46.655432,
-    image: '/placeholder.svg?height=200&width=200',
-    phone: '+55 11 4567-8901',
-    city: 'Belo Horizonte',
-  },
-  {
-    id: 5,
-    name: 'Câmera DSLR',
-    price: 2799.99,
-    store: 'Loja E',
-    distance: 2.0,
-    lat: -23.549876,
-    lng: -46.629876,
-    image: '/placeholder.svg?height=200&width=200',
-    phone: '+55 11 5678-9012',
-    city: 'Curitiba',
-  },
-];
+const generateRandomPrice = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};
+
+const generateRandomCoordinates = (baseLocation: { lat: number, lng: number }, radiusKm: number) => {
+  const earthRadius = 6371; // raio da Terra em km
+  const maxLat = baseLocation.lat + (radiusKm / earthRadius) * (180 / Math.PI);
+  const minLat = baseLocation.lat - (radiusKm / earthRadius) * (180 / Math.PI);
+  const maxLng = baseLocation.lng + (radiusKm / earthRadius) * (180 / Math.PI) / Math.cos(baseLocation.lat * Math.PI / 180);
+  const minLng = baseLocation.lng - (radiusKm / earthRadius) * (180 / Math.PI) / Math.cos(baseLocation.lat * Math.PI / 180);
+  
+  return {
+    lat: minLat + Math.random() * (maxLat - minLat),
+    lng: minLng + Math.random() * (maxLng - minLng)
+  };
+};
 
 export default function CompraBarat() {
+  const [products, setProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('price');
-  const [priceRange, setPriceRange] = useState([0, 4000]);
+  const [priceRange, setPriceRange] = useState([0, 1500000]);
   const [selectedCity, setSelectedCity] = useState('Todas');
-  const [products, setProducts] = useState(allProducts);
-
-  const cities = [
-    'Todas',
-    ...new Set(allProducts.map((product) => product.city)),
-  ];
+  const [isLoading, setIsLoading] = useState(true);
+  const [visibleProducts, setVisibleProducts] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const productsPerPage = 12;
 
   useEffect(() => {
-    const filtered = allProducts.filter(
+    const generateProducts = () => {
+      const cities = [
+        { name: 'Luanda', baseLocation: { lat: -8.8389, lng: 13.2894 } },
+        { name: 'Huambo', baseLocation: { lat: -12.7761, lng: 15.7392 } },
+        { name: 'Benguela', baseLocation: { lat: -12.5763, lng: 13.4055 } },
+        { name: 'Lobito', baseLocation: { lat: -12.3644, lng: 13.5366 } },
+        { name: 'Lubango', baseLocation: { lat: -14.9167, lng: 13.5000 } },
+      ];
+
+      const stores = [
+        'Loja Kero',
+        'Shoprite',
+        'Candando',
+        'Alimenta Angola',
+        'Jumbo',
+      ];
+
+      const products = [
+        'Smartphone Samsung Galaxy',
+        'iPhone',
+        'TV LED Sony',
+        'Notebook Dell',
+        'Geladeira Frost Free',
+        'Ar Condicionado Split',
+        'Máquina de Lavar',
+        'Micro-ondas',
+        'Ventilador de Teto',
+        'Fogão 4 Bocas',
+      ];
+
+      const generatedProducts = Array.from({ length: 500 }, (_, index) => {
+        const selectedCity = cities[Math.floor(Math.random() * cities.length)];
+        const coordinates = generateRandomCoordinates(selectedCity.baseLocation, 5);
+        const distance = (Math.random() * 5).toFixed(1);
+        const id = index + 1;
+
+        return {
+          id,
+          name: products[Math.floor(Math.random() * products.length)],
+          price: generateRandomPrice(50000, 1500000),
+          store: stores[Math.floor(Math.random() * stores.length)],
+          distance: parseFloat(distance),
+          lat: coordinates.lat,
+          lng: coordinates.lng,
+          image: `https://picsum.photos/seed/${id}/400/400`,
+          phone: `+244 ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)}`,
+          city: selectedCity.name,
+        };
+      });
+
+      setProducts(generatedProducts);
+      setVisibleProducts(generatedProducts.slice(0, productsPerPage));
+      setIsLoading(false);
+    };
+
+    generateProducts();
+  }, []);
+
+  const fetchMoreData = () => {
+    const startIndex = visibleProducts.length;
+    const endIndex = startIndex + productsPerPage;
+    const nextProducts = filteredProducts.slice(startIndex, endIndex);
+
+    if (nextProducts.length > 0) {
+      setVisibleProducts(prev => [...prev, ...nextProducts]);
+      setPage(prev => prev + 1);
+    }
+    
+    setHasMore(endIndex < filteredProducts.length);
+  };
+
+  useEffect(() => {
+    const initialProducts = filteredProducts.slice(0, productsPerPage);
+    setVisibleProducts(initialProducts);
+    setPage(1);
+    setHasMore(filteredProducts.length > productsPerPage);
+  }, [searchQuery, sortBy, priceRange, selectedCity]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(
       (product) =>
         (selectedCity === 'Todas' || product.city === selectedCity) &&
         product.price >= priceRange[0] &&
         product.price <= priceRange[1] &&
         (searchQuery === '' ||
           product.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-    const sorted = [...filtered].sort((a, b) =>
+    ).sort((a, b) =>
       sortBy === 'price' ? a.price - b.price : a.distance - b.distance
     );
-    setProducts(sorted);
-  }, [searchQuery, sortBy, priceRange, selectedCity]);
+  }, [products, searchQuery, sortBy, priceRange, selectedCity]);
 
-  const userLocation: [number, number] = [-23.55577, -46.63968]; // Example user location
+  const cities = useMemo(() => {
+    return ['Todas', ...Array.from(new Set(products.map((product) => product.city)))];
+  }, [products]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Carregando produtos...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -171,7 +214,7 @@ export default function CompraBarat() {
             </div>
             <Select value={selectedCity} onValueChange={setSelectedCity}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Selecione a cidade" />
+                <SelectValue placeholder="Todas as cidades" />
               </SelectTrigger>
               <SelectContent>
                 {cities.map((city) => (
@@ -192,13 +235,13 @@ export default function CompraBarat() {
                   <div className="space-y-2">
                     <h4 className="font-medium leading-none">Faixa de Preço</h4>
                     <p className="text-sm text-muted-foreground">
-                      R$ {priceRange[0]} - R$ {priceRange[1]}
+                      Kz {priceRange[0].toLocaleString()} - Kz {priceRange[1].toLocaleString()}
                     </p>
                   </div>
                   <Slider
                     min={0}
-                    max={4000}
-                    step={100}
+                    max={1500000}
+                    step={10000}
                     value={priceRange}
                     onValueChange={setPriceRange}
                   />
@@ -216,83 +259,104 @@ export default function CompraBarat() {
             </Select>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
-              <Card key={product.id}>
-                <CardHeader>
-                  <CardTitle>{product.name}</CardTitle>
-                  <CardDescription>
-                    {product.store} - {product.city}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="aspect-square relative mb-4">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-md"
-                    />
-                  </div>
-                  <p className="text-2xl font-bold">
-                    R$ {product.price.toFixed(2)}
-                  </p>
-                  <p className="text-sm text-gray-500 flex items-center mt-2">
-                    <MapPin className="mr-1 h-4 w-4" /> {product.distance} km de
-                    distância
-                  </p>
-                </CardContent>
-                <CardFooter className="flex flex-col space-y-2">
-                  <div className="flex justify-between w-full">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline">
-                          <MapPin className="mr-2 h-4 w-4" /> Ver no Mapa
+          <InfiniteScroll
+            dataLength={visibleProducts.length}
+            next={fetchMoreData}
+            hasMore={hasMore}
+            loader={
+              <div className="flex justify-center p-4">
+                <p>Carregando mais produtos...</p>
+              </div>
+            }
+            endMessage={
+              filteredProducts.length === 0 ? (
+                <div className="flex justify-center p-4 text-gray-500">
+                  <p>Nenhum produto encontrado.</p>
+                </div>
+              ) : (
+                <div className="flex justify-center p-4 text-gray-500">
+                  <p>Você viu todos os produtos disponíveis.</p>
+                </div>
+              )
+            }
+          >
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {visibleProducts.map((product) => (
+                <Card key={product.id}>
+                  <CardHeader>
+                    <CardTitle>{product.name}</CardTitle>
+                    <CardDescription>
+                      {product.store} - {product.city}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="aspect-square relative mb-4">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-md"
+                      />
+                    </div>
+                    <p className="text-2xl font-bold">
+                      Kz {product.price.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-gray-500 flex items-center mt-2">
+                      <MapPin className="mr-1 h-4 w-4" /> {product.distance} km de
+                      distância
+                    </p>
+                  </CardContent>
+                  <CardFooter className="flex flex-col space-y-2">
+                    <div className="flex justify-between w-full">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline">
+                            <MapPin className="mr-2 h-4 w-4" /> Ver no Mapa
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[800px] h-[500px]">
+                          <DialogHeader>
+                            <DialogTitle>Localização da Loja</DialogTitle>
+                            <DialogDescription>
+                              Veja a localização da loja no mapa
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="h-[400px] w-full">
+                            <StoreMap
+                              stores={[
+                                {
+                                  id: product.id,
+                                  name: product.store,
+                                  lat: product.lat,
+                                  lng: product.lng,
+                                  address: 'Endereço da loja',
+                                },
+                              ]}
+                              userLocation={null}
+                              setLocation={() => {}}
+                            />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <div className="flex justify-between w-full space-x-2">
+                      <a href={`tel:${product.phone}`} className="flex-1">
+                        <Button className="w-full">
+                          <Phone className="mr-2 h-4 w-4" /> Ligar
                         </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[800px]">
-                        <DialogHeader>
-                          <DialogTitle>Localização da Loja</DialogTitle>
-                          <DialogDescription>
-                            Veja a localização da loja no mapa
-                          </DialogDescription>
-                        </DialogHeader>
-                        <StoreMap
-                          stores={[
-                            {
-                              id: product.id,
-                              name: product.store,
-                              lat: product.lat,
-                              lng: product.lng,
-                              address: 'Endereço da loja',
-                            },
-                          ]}
-                          userLocation={userLocation}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                  <div className="flex justify-between w-full space-x-2">
-                    <Button
-                      as="a"
-                      href={`tel:${product.phone}`}
-                      className="flex-1"
-                    >
-                      <Phone className="mr-2 h-4 w-4" /> Ligar
-                    </Button>
-                    <Button
-                      as="a"
-                      href={`sms:${product.phone}`}
-                      className="flex-1"
-                    >
-                      <MessageSquare className="mr-2 h-4 w-4" /> Mensagem
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+                      </a>
+                      <a href={`sms:${product.phone}`} className="flex-1">
+                        <Button className="w-full">
+                          <MessageSquare className="mr-2 h-4 w-4" /> Mensagem
+                        </Button>
+                      </a>
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </InfiniteScroll>
         </div>
       </main>
 

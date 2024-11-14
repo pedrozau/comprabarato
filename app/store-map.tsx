@@ -5,24 +5,43 @@ import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+// Adicione esta declaração no topo do arquivo, após os imports
+declare module 'leaflet' {
+  interface Icon {
+    _getIconUrl?: string;
+  }
+}
+
 interface MapProps {
-  location: { lat: number; lng: number } | null;
+  stores: {
+    id: number;
+    name: string;
+    lat: number;
+    lng: number;
+    address: string;
+  }[];
+  userLocation: [number, number];
   setLocation: (location: { lat: number; lng: number }) => void;
 }
 
-function DraggableMarker({ location, setLocation }: MapProps) {
+interface DraggableMarkerProps {
+  location: [number, number];
+  setLocation: (location: { lat: number; lng: number }) => void;
+}
+
+function DraggableMarker({ location, setLocation }: DraggableMarkerProps) {
   const map = useMap();
 
   useEffect(() => {
     if (location) {
-      map.setView([location.lat, location.lng], 13);
+      map.setView([location[0], location[1]], 13);
     }
   }, [location, map]);
 
   return location ? (
     <Marker
       draggable={true}
-      position={[location.lat, location.lng]}
+      position={[location[0], location[1]]}
       eventHandlers={{
         dragend: (e) => {
           const marker = e.target;
@@ -34,7 +53,7 @@ function DraggableMarker({ location, setLocation }: MapProps) {
   ) : null;
 }
 
-export default function Map({ location, setLocation }: MapProps) {
+const StoreMap: React.FC<MapProps> = ({ stores, userLocation, setLocation }) => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       delete L.Icon.Default.prototype._getIconUrl;
@@ -47,13 +66,13 @@ export default function Map({ location, setLocation }: MapProps) {
   }, []);
 
   // Exibe um carregamento se `location` for nulo
-  if (!location) {
+  if (!userLocation) {
     return <div>Loading map...</div>;
   }
 
   return (
     <MapContainer
-      center={[location.lat, location.lng]}
+      center={[userLocation[0], userLocation[1]]}
       zoom={13}
       style={{ height: '100%', width: '100%' }}
     >
@@ -61,7 +80,9 @@ export default function Map({ location, setLocation }: MapProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <DraggableMarker location={location} setLocation={setLocation} />
+      <DraggableMarker location={userLocation} setLocation={setLocation} />
     </MapContainer>
   );
 }
+
+export default StoreMap;

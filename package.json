@@ -32,6 +32,7 @@
     "postcss": "8.4.30",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-leaflet": "^4.2.1",
     "recharts": "^2.13.3",
     "tailwind-merge": "^2.5.4",
