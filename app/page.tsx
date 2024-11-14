@@ -79,64 +79,25 @@ export default function CompraBarat() {
   const [page, setPage] = useState(1);
   const productsPerPage = 12;
 
+  const filteredProducts = useMemo(() => {
+    return products.filter(
+      (product) =>
+        (selectedCity === 'Todas' || product.city === selectedCity) &&
+        product.price >= priceRange[0] &&
+        product.price <= priceRange[1] &&
+        (searchQuery === '' ||
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    ).sort((a, b) =>
+      sortBy === 'price' ? a.price - b.price : a.distance - b.distance
+    );
+  }, [products, searchQuery, sortBy, priceRange, selectedCity]);
+
   useEffect(() => {
-    const generateProducts = () => {
-      const cities = [
-        { name: 'Luanda', baseLocation: { lat: -8.8389, lng: 13.2894 } },
-        { name: 'Huambo', baseLocation: { lat: -12.7761, lng: 15.7392 } },
-        { name: 'Benguela', baseLocation: { lat: -12.5763, lng: 13.4055 } },
-        { name: 'Lobito', baseLocation: { lat: -12.3644, lng: 13.5366 } },
-        { name: 'Lubango', baseLocation: { lat: -14.9167, lng: 13.5000 } },
-      ];
-
-      const stores = [
-        'Loja Kero',
-        'Shoprite',
-        'Candando',
-        'Alimenta Angola',
-        'Jumbo',
-      ];
-
-      const products = [
-        'Smartphone Samsung Galaxy',
-        'iPhone',
-        'TV LED Sony',
-        'Notebook Dell',
-        'Geladeira Frost Free',
-        'Ar Condicionado Split',
-        'Máquina de Lavar',
-        'Micro-ondas',
-        'Ventilador de Teto',
-        'Fogão 4 Bocas',
-      ];
-
-      const generatedProducts = Array.from({ length: 500 }, (_, index) => {
-        const selectedCity = cities[Math.floor(Math.random() * cities.length)];
-        const coordinates = generateRandomCoordinates(selectedCity.baseLocation, 5);
-        const distance = (Math.random() * 5).toFixed(1);
-        const id = index + 1;
-
-        return {
-          id,
-          name: products[Math.floor(Math.random() * products.length)],
-          price: generateRandomPrice(50000, 1500000),
-          store: stores[Math.floor(Math.random() * stores.length)],
-          distance: parseFloat(distance),
-          lat: coordinates.lat,
-          lng: coordinates.lng,
-          image: `https://picsum.photos/seed/${id}/400/400`,
-          phone: `+244 ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 900 + 100)}`,
-          city: selectedCity.name,
-        };
-      });
-
-      setProducts(generatedProducts);
-      setVisibleProducts(generatedProducts.slice(0, productsPerPage));
-      setIsLoading(false);
-    };
-
-    generateProducts();
-  }, []);
+    const initialProducts = filteredProducts.slice(0, productsPerPage);
+    setVisibleProducts(initialProducts);
+    setPage(1);
+    setHasMore(filteredProducts.length > productsPerPage);
+  }, [searchQuery, sortBy, priceRange, selectedCity, filteredProducts, productsPerPage]);
 
   const fetchMoreData = () => {
     const startIndex = visibleProducts.length;
@@ -150,26 +111,6 @@ export default function CompraBarat() {
     
     setHasMore(endIndex < filteredProducts.length);
   };
-
-  useEffect(() => {
-    const initialProducts = filteredProducts.slice(0, productsPerPage);
-    setVisibleProducts(initialProducts);
-    setPage(1);
-    setHasMore(filteredProducts.length > productsPerPage);
-  }, [searchQuery, sortBy, priceRange, selectedCity]);
-
-  const filteredProducts = useMemo(() => {
-    return products.filter(
-      (product) =>
-        (selectedCity === 'Todas' || product.city === selectedCity) &&
-        product.price >= priceRange[0] &&
-        product.price <= priceRange[1] &&
-        (searchQuery === '' ||
-          product.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    ).sort((a, b) =>
-      sortBy === 'price' ? a.price - b.price : a.distance - b.distance
-    );
-  }, [products, searchQuery, sortBy, priceRange, selectedCity]);
 
   const cities = useMemo(() => {
     return ['Todas', ...Array.from(new Set(products.map((product) => product.city)))];
@@ -333,7 +274,7 @@ export default function CompraBarat() {
                                   address: 'Endereço da loja',
                                 },
                               ]}
-                              userLocation={null}
+                              userLocation={[0, 0]}
                               setLocation={() => {}}
                             />
                           </div>

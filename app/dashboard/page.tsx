@@ -247,11 +247,15 @@ export default function StoreDashboard() {
                     />
                     {imagePreview && (
                       <div className="mt-2">
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="max-w-full h-auto max-h-48 rounded-md"
-                        />
+                        <div className="relative w-full h-[200px]">
+                          <Image
+                            src={imagePreview}
+                            alt="Preview"
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
@@ -282,13 +286,15 @@ export default function StoreDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center space-x-4">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      width={100}
-                      height={100}
-                      className="rounded-md"
-                    />
+                    <div className="relative w-full h-[200px]">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
                     <div>
                       <p className="text-xl font-bold">
                         R$ {product.price.toFixed(2)}

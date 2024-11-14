@@ -12,6 +12,7 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import 'leaflet/dist/leaflet.css'
 import { useMap } from 'react-leaflet'
+import { useMapEvents } from 'react-leaflet'
 
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
@@ -25,12 +26,13 @@ const Marker = dynamic(
   () => import('react-leaflet').then((mod) => mod.Marker),
   { ssr: false }
 )
-const useMapEvents = dynamic(
-  () => import('react-leaflet').then((mod) => mod.useMapEvents),
-  { ssr: false }
-)
 
-function DraggableMarker({ position, setPosition }) {
+interface DraggableMarkerProps {
+  position: { lat: number; lng: number };
+  setPosition: (position: { lat: number; lng: number }) => void;
+}
+
+function DraggableMarker({ position, setPosition }: DraggableMarkerProps) {
   const map = useMap()
 
   useMapEvents({
