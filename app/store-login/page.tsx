@@ -42,7 +42,7 @@ export default function StoreLogin() {
     <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-purple-50 to-indigo-100">
       <div className="md:w-1/2 relative">
         <Image
-          src="/store-image.jpg"
+          src="/Shopping.gif"
           alt="Loja Compra Barato"
           layout="fill"
           objectFit="cover"

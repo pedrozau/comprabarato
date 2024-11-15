@@ -46,6 +46,7 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import dynamic from 'next/dynamic';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 const StoreMap = dynamic(() => import('./store-map'), { 
   ssr: false,
@@ -144,8 +145,8 @@ export default function CompraBarat() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Carregando produtos...</p>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <LoadingSpinner />
       </div>
     );
   }

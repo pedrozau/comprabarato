@@ -78,7 +78,7 @@ export default function StoreSignUp() {
       <div className="flex flex-col lg:flex-row gap-8 items-center justify-center">
         <div className="w-full lg:w-1/2 max-w-2xl">
           <Image
-            src="/placeholder.svg?height=600&width=600"
+            src="/Ecommerce-campaign.gif"
             alt="Ilustração de cadastro de loja"
             width={600}
             height={600}
