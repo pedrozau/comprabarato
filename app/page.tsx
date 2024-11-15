@@ -154,29 +154,29 @@ export default function CompraBarat() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Compra Barato</h1>
+      <header className="bg-white shadow sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Compra Barato</h1>
           
-          {/* Adicione o botão de pesquisa mobile */}
+          {/* Menu Mobile */}
           <div className="flex items-center gap-2 md:hidden">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => setIsSearchModalOpen(true)}
             >
-              <Search />
+              <Search className="h-5 w-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X /> : <Menu />}
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
 
-          {/* Menu Desktop permanece o mesmo */}
+          {/* Menu Desktop */}
           <nav className="hidden md:flex space-x-2">
             <Button variant="ghost"><Link href="store-login">Login</Link></Button>           
             <Button variant="ghost"><Link href="/faq">FAQ</Link></Button>
@@ -185,9 +185,9 @@ export default function CompraBarat() {
           </nav>
         </div>
 
-        {/* Menu Mobile */}
+        {/* Menu Mobile Dropdown - Adicione absolute para sobrepor o conteúdo */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200">
+          <div className="md:hidden border-t border-gray-200 bg-white absolute w-full shadow-lg">
             <div className="flex flex-col space-y-2 p-4">
               <Link href="store-login" className="w-full">
                 <Button variant="ghost" className="w-full justify-start">Login</Button>
@@ -206,7 +206,7 @@ export default function CompraBarat() {
         )}
       </header>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 md:pt-0 pt-4">
         {/* Barra de pesquisa desktop */}
         <div className="hidden md:block px-4 py-6 sm:px-0">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
