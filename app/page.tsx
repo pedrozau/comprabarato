@@ -82,6 +82,7 @@ export default function CompraBarat() {
   const [page, setPage] = useState(1);
   const productsPerPage = 12;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   useEffect(() => {
     // Simulando dados de produtos
@@ -157,23 +158,31 @@ export default function CompraBarat() {
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">Compra Barato</h1>
           
-          {/* Menu para Desktop */}
+          {/* Adicione o botão de pesquisa mobile */}
+          <div className="flex items-center gap-2 md:hidden">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setIsSearchModalOpen(true)}
+            >
+              <Search />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X /> : <Menu />}
+            </Button>
+          </div>
+
+          {/* Menu Desktop permanece o mesmo */}
           <nav className="hidden md:flex space-x-2">
             <Button variant="ghost"><Link href="store-login">Login</Link></Button>           
             <Button variant="ghost"><Link href="/faq">FAQ</Link></Button>
             <Button variant="ghost"><Link href="/store-signup">Registrar Loja</Link></Button>
             <Button variant="ghost"><Link href="/about">Sobre Nós</Link></Button>
           </nav>
-
-          {/* Botão do Menu Mobile */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X /> : <Menu />}
-          </Button>
         </div>
 
         {/* Menu Mobile */}
@@ -198,7 +207,8 @@ export default function CompraBarat() {
       </header>
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+        {/* Barra de pesquisa desktop */}
+        <div className="hidden md:block px-4 py-6 sm:px-0">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
             Compare preços e encontre as melhores ofertas perto de você!
           </h2>
@@ -258,106 +268,140 @@ export default function CompraBarat() {
               </SelectContent>
             </Select>
           </div>
-
-          <InfiniteScroll
-            dataLength={visibleProducts.length}
-            next={fetchMoreData}
-            hasMore={hasMore}
-            loader={
-              <div className="flex justify-center p-4">
-                <p>Carregando mais produtos...</p>
-              </div>
-            }
-            endMessage={
-              filteredProducts.length === 0 ? (
-                <div className="flex justify-center p-4 text-gray-500">
-                  <p>Nenhum produto encontrado.</p>
-                </div>
-              ) : (
-                <div className="flex justify-center p-4 text-gray-500">
-                  <p>Você viu todos os produtos disponíveis.</p>
-                </div>
-              )
-            }
-          >
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {visibleProducts.map((product) => (
-                <Card key={product.id}>
-                  <CardHeader>
-                    <CardTitle>{product.name}</CardTitle>
-                    <CardDescription>
-                      {product.store} - {product.city}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="aspect-square relative mb-4">
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        layout="fill"
-                        objectFit="cover"
-                        className="rounded-md"
-                      />
-                    </div>
-                    <p className="text-2xl font-bold">
-                      Kz {product.price.toLocaleString()}
-                    </p>
-                    <p className="text-sm text-gray-500 flex items-center mt-2">
-                      <MapPin className="mr-1 h-4 w-4" /> {product.distance} km de
-                      distância
-                    </p>
-                  </CardContent>
-                  <CardFooter className="flex flex-col space-y-2">
-                    <div className="flex justify-between w-full">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline">
-                            <MapPin className="mr-2 h-4 w-4" /> Ver no Mapa
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[800px] h-[500px]">
-                          <DialogHeader>
-                            <DialogTitle>Localização da Loja</DialogTitle>
-                            <DialogDescription>
-                              Veja a localização da loja no mapa
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="h-[400px] w-full">
-                            <StoreMap
-                              stores={[
-                                {
-                                  id: product.id,
-                                  name: product.store,
-                                  lat: product.lat,
-                                  lng: product.lng,
-                                  address: 'Endereço da loja',
-                                },
-                              ]}
-                              userLocation={[0, 0]}
-                              setLocation={() => {}}
-                            />
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                    <div className="flex justify-between w-full space-x-2">
-                      <a href={`tel:${product.phone}`} className="flex-1">
-                        <Button className="w-full">
-                          <Phone className="mr-2 h-4 w-4" /> Ligar
-                        </Button>
-                      </a>
-                      <a href={`sms:${product.phone}`} className="flex-1">
-                        <Button className="w-full">
-                          <MessageSquare className="mr-2 h-4 w-4" /> Mensagem
-                        </Button>
-                      </a>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          </InfiniteScroll>
         </div>
+
+        {/* Modal de pesquisa mobile */}
+        <Dialog open={isSearchModalOpen} onOpenChange={setIsSearchModalOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Filtros de Pesquisa</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-4">
+              <Input
+                type="text"
+                placeholder="Digite o nome do produto"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Select value={selectedCity} onValueChange={setSelectedCity}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas as cidades" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((city) => (
+                    <SelectItem key={city} value={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="space-y-2">
+                <Label>Faixa de Preço</Label>
+                <p className="text-sm text-muted-foreground">
+                  Kz {priceRange[0].toLocaleString()} - Kz {priceRange[1].toLocaleString()}
+                </p>
+                <Slider
+                  min={0}
+                  max={1500000}
+                  step={10000}
+                  value={priceRange}
+                  onValueChange={setPriceRange}
+                />
+              </div>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="price">Menor Preço</SelectItem>
+                  <SelectItem value="distance">Mais Próximo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Grid de produtos com cards menores */}
+        <InfiniteScroll
+          dataLength={visibleProducts.length}
+          next={fetchMoreData}
+          hasMore={hasMore}
+          loader={<div className="flex justify-center p-4"><p>Carregando mais produtos...</p></div>}
+        >
+          <div className="grid grid-cols-2 gap-2 px-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-4 sm:px-0">
+            {visibleProducts.map((product) => (
+              <Card key={product.id} className="overflow-hidden">
+                <CardHeader className="p-3">
+                  <CardTitle className="text-sm sm:text-base">{product.name}</CardTitle>
+                  <CardDescription className="text-xs">
+                    {product.store} - {product.city}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-3">
+                  <div className="aspect-square relative mb-2">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-md"
+                    />
+                  </div>
+                  <p className="text-lg font-bold">
+                    Kz {product.price.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-gray-500 flex items-center mt-1">
+                    <MapPin className="mr-1 h-3 w-3" /> {product.distance} km
+                  </p>
+                </CardContent>
+                <CardFooter className="p-3 flex flex-col gap-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-full">
+                        <MapPin className="mr-1 h-3 w-3" /> Ver Mapa
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[800px] h-[500px]">
+                      <DialogHeader>
+                        <DialogTitle>Localização da Loja</DialogTitle>
+                        <DialogDescription>
+                          Veja a localização da loja no mapa
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="h-[400px] w-full">
+                        <StoreMap
+                          stores={[
+                            {
+                              id: product.id,
+                              name: product.store,
+                              lat: product.lat,
+                              lng: product.lng,
+                              address: 'Endereço da loja',
+                            },
+                          ]}
+                          userLocation={[0, 0]}
+                          setLocation={() => {}}
+                        />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <div className="flex gap-2">
+                    <a href={`tel:${product.phone}`} className="flex-1">
+                      <Button size="sm" className="w-full">
+                        <Phone className="h-3 w-3" />
+                      </Button>
+                    </a>
+                    <a href={`sms:${product.phone}`} className="flex-1">
+                      <Button size="sm" className="w-full">
+                        <MessageSquare className="h-3 w-3" />
+                      </Button>
+                    </a>
+                  </div>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </InfiniteScroll>
       </main>
 
       <footer className="bg-white shadow mt-8">
