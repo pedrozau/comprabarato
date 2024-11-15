@@ -9,6 +9,8 @@ import {
   Phone,
   MessageSquare,
   SlidersHorizontal,
+  Menu,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -78,6 +80,7 @@ export default function CompraBarat() {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const productsPerPage = 12;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // Simulando dados de produtos
@@ -152,13 +155,45 @@ export default function CompraBarat() {
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">Compra Barato</h1>
-          <nav>
+          
+          {/* Menu para Desktop */}
+          <nav className="hidden md:flex space-x-2">
             <Button variant="ghost"><Link href="store-login">Login</Link></Button>           
             <Button variant="ghost"><Link href="/faq">FAQ</Link></Button>
             <Button variant="ghost"><Link href="/store-signup">Registrar Loja</Link></Button>
             <Button variant="ghost"><Link href="/about">Sobre Nós</Link></Button>
           </nav>
+
+          {/* Botão do Menu Mobile */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X /> : <Menu />}
+          </Button>
         </div>
+
+        {/* Menu Mobile */}
+        {isMenuOpen && (
+          <div className="md:hidden border-t border-gray-200">
+            <div className="flex flex-col space-y-2 p-4">
+              <Link href="store-login" className="w-full">
+                <Button variant="ghost" className="w-full justify-start">Login</Button>
+              </Link>
+              <Link href="/faq" className="w-full">
+                <Button variant="ghost" className="w-full justify-start">FAQ</Button>
+              </Link>
+              <Link href="/store-signup" className="w-full">
+                <Button variant="ghost" className="w-full justify-start">Registrar Loja</Button>
+              </Link>
+              <Link href="/about" className="w-full">
+                <Button variant="ghost" className="w-full justify-start">Sobre Nós</Button>
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
