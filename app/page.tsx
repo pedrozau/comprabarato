@@ -47,6 +47,7 @@ import { Label } from '@/components/ui/label';
 import dynamic from 'next/dynamic';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { supabase } from '@/lib/supabaseClient';
 
 const StoreMap = dynamic(() => import('./store-map'), { 
   ssr: false,
@@ -70,6 +71,8 @@ const generateRandomCoordinates = (baseLocation: { lat: number, lng: number }, r
   };
 };
 
+
+
 export default function CompraBarat() {
   const [products, setProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,34 +86,91 @@ export default function CompraBarat() {
   const productsPerPage = 12;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
 
   useEffect(() => {
-    // Simulando dados de produtos
-    const baseLocation = { lat: -8.8383, lng: 13.2344 }; // Coordenadas de Luanda
-    const mockProducts = Array.from({ length: 50 }, (_, i) => {
-      const coordinates = generateRandomCoordinates(baseLocation, 10);
-      return {
-        id: i + 1,
-        name: `Produto ${i + 1}`,
-        store: `Loja ${i + 1}`,
-        city: ['Luanda', 'Viana', 'Cacuaco', 'Belas'][Math.floor(Math.random() * 4)],
-        price: generateRandomPrice(1000, 1500000),
-        image: `https://picsum.photos/seed/${i + 1}/400/400`,
-        distance: Number((Math.random() * 10).toFixed(1)),
-        phone: '123456789',
-        lat: coordinates.lat,
-        lng: coordinates.lng
-      };
-    });
+    const fetchProducts = async () => {
+      const { data: products, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          stores (
+            id,
+            name,
+            email,
+            province,
+            store_type,
+            phone,
+            description,
+            latitude,
+            longitude
+          )
+        `);
 
-    setProducts(mockProducts);
-    setIsLoading(false);
+      if (error) {
+        console.error('Erro ao buscar produtos:', error);
+      } else {
+        setProducts(products);
+      }
+      setIsLoading(false);
+    };
+
+    fetchProducts();
   }, []);
 
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Erro ao obter localização do usuário:", error);
+        }
+      );
+    } else {
+      console.error("Geolocalização não é suportada pelo navegador.");
+    }
+  }, []);
+
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const toRadians = (degree: number) => (degree * Math.PI) / 180;
+
+    const R = 6371; // Raio da Terra em km
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return Math.round(R * c); // Distância em km
+  };
+
+  const productsWithDistance = useMemo(() => {
+    if (!userLocation) return products;
+
+    return products.map(product => {
+      const distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lon,
+        product.stores.latitude,
+        product.stores.longitude
+      );
+      return { ...product, distance };
+    });
+  }, [products, userLocation]);
+
   const filteredProducts = useMemo(() => {
-    return products.filter(
+    return productsWithDistance.filter(
       (product) =>
-        (selectedCity === 'Todas' || product.city === selectedCity) &&
+        (selectedCity === 'Todas' || product.stores.province === selectedCity) &&
         product.price >= priceRange[0] &&
         product.price <= priceRange[1] &&
         (searchQuery === '' ||
@@ -118,7 +178,7 @@ export default function CompraBarat() {
     ).sort((a, b) =>
       sortBy === 'price' ? a.price - b.price : a.distance - b.distance
     );
-  }, [products, searchQuery, sortBy, priceRange, selectedCity]);
+  }, [productsWithDistance, searchQuery, sortBy, priceRange, selectedCity]);
 
   useEffect(() => {
     const initialProducts = filteredProducts.slice(0, productsPerPage);
@@ -141,7 +201,7 @@ export default function CompraBarat() {
   };
 
   const cities = useMemo(() => {
-    return ['Todas', ...Array.from(new Set(products.map((product) => product.city)))];
+    return ['Todas', ...Array.from(new Set(products.map((product) => product.stores.province)))];
   }, [products]);
 
   if (isLoading) {
@@ -334,13 +394,13 @@ export default function CompraBarat() {
                 <CardHeader className="p-3">
                   <CardTitle className="text-sm sm:text-base">{product.name}</CardTitle>
                   <CardDescription className="text-xs">
-                    {product.store} - {product.city}
+                    {product.stores.name} - {product.stores.province}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-3">
                   <div className="aspect-square relative mb-2">
                     <Image
-                      src={product.image}
+                      src={product.image_url}
                       alt={product.name}
                       layout="fill"
                       objectFit="cover"
@@ -372,26 +432,26 @@ export default function CompraBarat() {
                         <StoreMap
                           stores={[
                             {
-                              id: product.id,
-                              name: product.store,
-                              lat: product.lat,
-                              lng: product.lng,
+                              id: product.stores.id,
+                              name: product.stores.name,
+                              lat: product.stores.latitude,
+                              lng: product.stores.longitude,
                               address: 'Endereço da loja',
                             },
                           ]}
-                          userLocation={[0, 0]}
+                          userLocation={userLocation ? [userLocation.lat, userLocation.lon] : [0, 0]}
                           setLocation={() => {}}
                         />
                       </div>
                     </DialogContent>
                   </Dialog>
                   <div className="flex gap-2">
-                    <a href={`tel:${product.phone}`} className="flex-1">
+                    <a href={`tel:${product.stores.phone}`} className="flex-1">
                       <Button size="sm" className="w-full">
                         <Phone className="h-3 w-3" />
                       </Button>
                     </a>
-                    <a href={`sms:${product.phone}`} className="flex-1">
+                    <a href={`sms:${product.stores.phone}`} className="flex-1">
                       <Button size="sm" className="w-full">
                         <MessageSquare className="h-3 w-3" />
                       </Button>
