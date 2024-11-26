@@ -222,7 +222,7 @@ export default function CompraBarat() {
           <svg
             width="150"
             height="50"
-            viewBox="0 0 150 50"
+            viewBox="0 0 160 50"
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
           >
@@ -249,10 +249,10 @@ export default function CompraBarat() {
             <circle cx="32" cy="35" r="2" fill="#fff" />
 
             <text
-              x="50"
+              x="55"
               y="30"
               fontFamily="Verdana, sans-serif"
-              fontSize="12"
+              fontSize="14"
               fill="#1E3A8A"
               style={{ textShadow: "1px 1px 2px rgba(0, 0, 0, 0.3)" }}
             >
@@ -323,7 +323,7 @@ export default function CompraBarat() {
                 placeholder="Digite o nome do produto"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full border-2 border-blue-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border-2 border-blue-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-blue-50 text-blue-900 placeholder-blue-400"
               />
             </div>
             <Select value={selectedCity} onValueChange={setSelectedCity}>
