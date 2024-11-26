@@ -150,7 +150,7 @@ export default function CompraBarat() {
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return Math.round(R * c); // Distância em km
+    return R * c; // Distância em km
   };
 
   const productsWithDistance = useMemo(() => {
@@ -175,10 +175,8 @@ export default function CompraBarat() {
         product.price <= priceRange[1] &&
         (searchQuery === '' ||
           product.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    ).sort((a, b) =>
-      sortBy === 'price' ? a.price - b.price : a.distance - b.distance
-    );
-  }, [productsWithDistance, searchQuery, sortBy, priceRange, selectedCity]);
+    ).sort((a, b) => a.distance - b.distance);
+  }, [productsWithDistance, searchQuery, priceRange, selectedCity]);
 
   useEffect(() => {
     const initialProducts = filteredProducts.slice(0, productsPerPage);
