@@ -150,7 +150,7 @@ export default function CompraBarat() {
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return R * c; // Distância em km
+    return Math.round(R * c); // Distância em km
   };
 
   const productsWithDistance = useMemo(() => {
