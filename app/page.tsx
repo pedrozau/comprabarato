@@ -76,7 +76,7 @@ const generateRandomCoordinates = (baseLocation: { lat: number, lng: number }, r
 export default function CompraBarat() {
   const [products, setProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('price');
+  const [sortBy, setSortBy] = useState('distance');
   const [priceRange, setPriceRange] = useState([0, 1500000]);
   const [selectedCity, setSelectedCity] = useState('Todas');
   const [isLoading, setIsLoading] = useState(true);
@@ -175,8 +175,13 @@ export default function CompraBarat() {
         product.price <= priceRange[1] &&
         (searchQuery === '' ||
           product.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    ).sort((a, b) => a.distance - b.distance);
-  }, [productsWithDistance, searchQuery, priceRange, selectedCity]);
+    ).sort((a, b) => {
+      if (sortBy === 'price') {
+        return a.price - b.price;
+      }
+      return a.distance - b.distance;
+    });
+  }, [productsWithDistance, searchQuery, priceRange, selectedCity, sortBy]);
 
   useEffect(() => {
     const initialProducts = filteredProducts.slice(0, productsPerPage);
