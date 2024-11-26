@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -65,7 +65,6 @@ const StoreMap: React.FC<MapProps> = ({ stores, userLocation, setLocation }) => 
     }
   }, []);
 
-  // Exibe um carregamento se `location` for nulo
   if (!userLocation) {
     return <div>Loading map...</div>;
   }
@@ -80,6 +79,15 @@ const StoreMap: React.FC<MapProps> = ({ stores, userLocation, setLocation }) => 
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
+      {stores.map((store) => (
+        <Marker
+          key={store.id}
+          position={[store.lat, store.lng]}
+          title={store.name}
+        >
+          <Popup>{store.name}</Popup>
+        </Marker>
+      ))}
       <DraggableMarker location={userLocation} setLocation={setLocation} />
     </MapContainer>
   );

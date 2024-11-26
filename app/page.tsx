@@ -219,7 +219,46 @@ export default function CompraBarat() {
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow sticky top-0 z-50">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Compra Barato</h1>
+          <svg
+            width="150"
+            height="50"
+            viewBox="0 0 150 50"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+          >
+            <defs>
+              <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{ stopColor: "#FF5733", stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: "#FFC300", stopOpacity: 1 }} />
+              </linearGradient>
+              <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{ stopColor: "#DAF7A6", stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: "#33FF57", stopOpacity: 1 }} />
+              </linearGradient>
+            </defs>
+
+            <circle cx="25" cy="25" r="20" fill="url(#grad1)" />
+
+            <path
+              d="M15 20 L20 20 L22 30 L35 30 L37 25 L20 25"
+              fill="none"
+              stroke="#fff"
+              strokeWidth="1.5"
+            />
+            <circle cx="25" cy="35" r="2" fill="#fff" />
+            <circle cx="32" cy="35" r="2" fill="#fff" />
+
+            <text
+              x="50"
+              y="30"
+              fontFamily="Verdana, sans-serif"
+              fontSize="12"
+              fill="#1E3A8A"
+              style={{ textShadow: "1px 1px 2px rgba(0, 0, 0, 0.3)" }}
+            >
+              Compra Barato
+            </text>
+          </svg>
           
           {/* Menu Mobile */}
           <div className="flex items-center gap-2 md:hidden">
@@ -227,6 +266,7 @@ export default function CompraBarat() {
               variant="ghost" 
               size="icon"
               onClick={() => setIsSearchModalOpen(true)}
+              className="text-blue-500"
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -234,6 +274,7 @@ export default function CompraBarat() {
               variant="ghost" 
               size="icon"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-blue-500"
             >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -241,28 +282,28 @@ export default function CompraBarat() {
 
           {/* Menu Desktop */}
           <nav className="hidden md:flex space-x-2">
-            <Button variant="ghost"><Link href="store-login">Login</Link></Button>           
-            <Button variant="ghost"><Link href="/faq">FAQ</Link></Button>
-            <Button variant="ghost"><Link href="/store-signup">Registrar Loja</Link></Button>
-            <Button variant="ghost"><Link href="/about">Sobre Nós</Link></Button>
+            <Button variant="ghost" className="text-blue-500"><Link href="store-login">Login</Link></Button>           
+            <Button variant="ghost" className="text-blue-500"><Link href="/faq">FAQ</Link></Button>
+            <Button variant="ghost" className="text-blue-500"><Link href="/store-signup">Registrar Loja</Link></Button>
+            <Button variant="ghost" className="text-blue-500"><Link href="/about">Sobre Nós</Link></Button>
           </nav>
         </div>
 
-        {/* Menu Mobile Dropdown - Adicione absolute para sobrepor o conteúdo */}
+        {/* Menu Mobile Dropdown */}
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 bg-white absolute w-full shadow-lg">
             <div className="flex flex-col space-y-2 p-4">
               <Link href="store-login" className="w-full">
-                <Button variant="ghost" className="w-full justify-start">Login</Button>
+                <Button variant="ghost" className="w-full justify-start text-blue-500">Login</Button>
               </Link>
               <Link href="/faq" className="w-full">
-                <Button variant="ghost" className="w-full justify-start">FAQ</Button>
+                <Button variant="ghost" className="w-full justify-start text-blue-500">FAQ</Button>
               </Link>
               <Link href="/store-signup" className="w-full">
-                <Button variant="ghost" className="w-full justify-start">Registrar Loja</Button>
+                <Button variant="ghost" className="w-full justify-start text-blue-500">Registrar Loja</Button>
               </Link>
               <Link href="/about" className="w-full">
-                <Button variant="ghost" className="w-full justify-start">Sobre Nós</Button>
+                <Button variant="ghost" className="w-full justify-start text-blue-500">Sobre Nós</Button>
               </Link>
             </div>
           </div>
@@ -272,7 +313,7 @@ export default function CompraBarat() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 md:pt-0 pt-4">
         {/* Barra de pesquisa desktop */}
         <div className="hidden md:block px-4 py-6 sm:px-0">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+          <h2 className="text-2xl font-semibold text-blue-900 mb-4">
             Compare preços e encontre as melhores ofertas perto de você!
           </h2>
           <div className="flex flex-wrap gap-4 mb-8">
@@ -282,7 +323,7 @@ export default function CompraBarat() {
                 placeholder="Digite o nome do produto"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
+                className="w-full border-2 border-blue-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <Select value={selectedCity} onValueChange={setSelectedCity}>
@@ -299,7 +340,7 @@ export default function CompraBarat() {
             </Select>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" className="text-blue-500 border-blue-500">
                   <SlidersHorizontal className="mr-2 h-4 w-4" /> Filtrar Preço
                 </Button>
               </PopoverTrigger>
@@ -384,94 +425,107 @@ export default function CompraBarat() {
           </DialogContent>
         </Dialog>
 
-        {/* Grid de produtos com cards menores */}
-        <InfiniteScroll
-          dataLength={visibleProducts.length}
-          next={fetchMoreData}
-          hasMore={hasMore}
-          loader={<div className="flex justify-center p-4"><p>Carregando mais produtos...</p></div>}
-        >
-          <div className="grid grid-cols-2 gap-2 px-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-4 sm:px-0">
-            {visibleProducts.map((product) => (
-              <Card key={product.id} className="overflow-hidden">
-                <CardHeader className="p-3">
-                  <CardTitle className="text-sm sm:text-base">{product.name}</CardTitle>
-                  <CardDescription className="text-xs">
-                    {product.stores.name} - {product.stores.province}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-3">
-                  <div className="aspect-square relative mb-2">
-                    <Image
-                      src={product.image_url}
-                      alt={product.name}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-md"
-                    />
-                  </div>
-                  <p className="text-lg font-bold">
-                    Kz {product.price.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-gray-500 flex items-center mt-1">
-                    <MapPin className="mr-1 h-3 w-3" /> {product.distance} km
-                  </p>
-                </CardContent>
-                <CardFooter className="p-3 flex flex-col gap-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="w-full">
-                        <MapPin className="mr-1 h-3 w-3" /> Ver Mapa
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[800px] h-[500px]">
-                      <DialogHeader>
-                        <DialogTitle>Localização da Loja</DialogTitle>
-                        <DialogDescription>
-                          Veja a localização da loja no mapa
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="h-[400px] w-full">
-                        <StoreMap
-                          stores={[
-                            {
-                              id: product.stores.id,
-                              name: product.stores.name,
-                              lat: product.stores.latitude,
-                              lng: product.stores.longitude,
-                              address: 'Endereço da loja',
-                            },
-                          ]}
-                          userLocation={userLocation ? [userLocation.lat, userLocation.lon] : [0, 0]}
-                          setLocation={() => {}}
-                        />
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  <div className="flex gap-2">
-                    <a href={`tel:${product.stores.phone}`} className="flex-1">
-                      <Button size="sm" className="w-full">
-                        <Phone className="h-3 w-3" />
-                      </Button>
-                    </a>
-                    <a href={`sms:${product.stores.phone}`} className="flex-1">
-                      <Button size="sm" className="w-full">
-                        <MessageSquare className="h-3 w-3" />
-                      </Button>
-                    </a>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
+        {/* Verificação de produtos filtrados */}
+        {filteredProducts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Image
+              src="/Questions-cuate.svg" // Substitua pelo caminho da sua ilustração
+              alt="Nenhum produto encontrado"
+              width={200}
+              height={200}
+              className="mb-4"
+            />
+            <p className="md:text-lg text-center text-gray-700">Nenhum produto encontrado. Tente ajustar seus filtros ou pesquisar por outro termo.</p>
           </div>
-        </InfiniteScroll>
+        ) : (
+          <InfiniteScroll
+            dataLength={visibleProducts.length}
+            next={fetchMoreData}
+            hasMore={hasMore}
+            loader={<div className="flex justify-center p-4"><p>Carregando mais produtos...</p></div>}
+          >
+            <div className="grid grid-cols-2 gap-2 px-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-4 sm:px-0">
+              {visibleProducts.map((product) => (
+                <Card key={product.id} className="overflow-hidden">
+                  <CardHeader className="p-3 bg-blue-50">
+                    <CardTitle className="text-sm sm:text-base text-blue-900">{product.name}</CardTitle>
+                    <CardDescription className="text-xs text-blue-700">
+                      {product.stores.name} - {product.stores.province}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-3">
+                    <div className="aspect-square relative mb-2">
+                      <Image
+                        src={product.image_url}
+                        alt={product.name}
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-md"
+                      />
+                    </div>
+                    <p className="text-lg font-bold text-orange-600">
+                      Kz {product.price.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-gray-500 flex items-center mt-1">
+                      <MapPin className="mr-1 h-3 w-3" /> {product.distance} km
+                    </p>
+                  </CardContent>
+                  <CardFooter className="p-3 flex flex-col gap-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full text-blue-500 border-blue-500">
+                          <MapPin className="mr-1 h-3 w-3" /> Ver Mapa
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[800px] h-[500px]">
+                        <DialogHeader>
+                          <DialogTitle>Localização da Loja</DialogTitle>
+                          <DialogDescription>
+                            Veja a localização da loja no mapa
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="h-[400px] w-full">
+                          <StoreMap
+                            stores={[
+                              {
+                                id: product.stores.id,
+                                name: product.stores.name,
+                                lat: product.stores.latitude,
+                                lng: product.stores.longitude,
+                                address: 'Endereço da loja',
+                              },
+                            ]}
+                            userLocation={userLocation ? [userLocation.lat, userLocation.lon] : [0, 0]}
+                            setLocation={() => {}}
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    <div className="flex gap-2">
+                      <a href={`tel:${product.stores.phone}`} className="flex-1">
+                        <Button size="sm" className="w-full text-blue-500 border-blue-500">
+                          <Phone className="h-3 w-3" />
+                        </Button>
+                      </a>
+                      <a href={`sms:${product.stores.phone}`} className="flex-1">
+                        <Button size="sm" className="w-full text-blue-500 border-blue-500">
+                          <MessageSquare className="h-3 w-3" />
+                        </Button>
+                      </a>
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </InfiniteScroll>
+        )}
       </main>
 
       <footer className="bg-white shadow mt-8">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <p>&copy; 2023 Compra Barato. Todos os direitos reservados.</p>
+          <p className="text-blue-900">&copy; 2023 Compra Barato. Todos os direitos reservados.</p>
           <div className="flex space-x-4">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-blue-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -487,7 +541,7 @@ export default function CompraBarat() {
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
               </svg>
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-blue-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -503,7 +557,7 @@ export default function CompraBarat() {
                 <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
               </svg>
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-blue-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
