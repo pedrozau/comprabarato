@@ -282,9 +282,9 @@ export default function CompraBarat() {
 
           {/* Menu Desktop */}
           <nav className="hidden md:flex space-x-2">
-            <Button variant="ghost" className="text-blue-500"><Link href="store-login">Login</Link></Button>           
+            <Button variant="ghost" className="text-blue-500"><Link href="https://lojacomprabarato.vercel.app/login">Login</Link></Button>           
             <Button variant="ghost" className="text-blue-500"><Link href="/faq">FAQ</Link></Button>
-            <Button variant="ghost" className="text-blue-500"><Link href="/store-signup">Registrar Loja</Link></Button>
+            <Button variant="ghost" className="text-blue-500"><Link href="https://lojacomprabarato.vercel.app/register">Registrar Loja</Link></Button>
             <Button variant="ghost" className="text-blue-500"><Link href="/about">Sobre Nós</Link></Button>
           </nav>
         </div>
