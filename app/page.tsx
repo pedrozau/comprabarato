@@ -48,6 +48,7 @@ import dynamic from 'next/dynamic';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { supabase } from '@/lib/supabaseClient';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const StoreMap = dynamic(() => import('./store-map'), { 
   ssr: false,
@@ -512,6 +513,28 @@ export default function CompraBarat() {
                           <MessageSquare className="h-3 w-3" />
                         </Button>
                       </a>
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+
+              {/* Skeleton para carregamento */}
+              {isLoading && Array.from({ length: productsPerPage }).map((_, index) => (
+                <Card key={index} className="overflow-hidden">
+                  <CardHeader className="p-3 bg-blue-50">
+                    <Skeleton className="h-4 w-3/4 mb-2" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </CardHeader>
+                  <CardContent className="p-3">
+                    <Skeleton className="aspect-square mb-2" />
+                    <Skeleton className="h-5 w-1/2 mb-1" />
+                    <Skeleton className="h-3 w-1/3" />
+                  </CardContent>
+                  <CardFooter className="p-3 flex flex-col gap-2">
+                    <Skeleton className="h-8 w-full mb-2" />
+                    <div className="flex gap-2">
+                      <Skeleton className="h-8 w-1/2" />
+                      <Skeleton className="h-8 w-1/2" />
                     </div>
                   </CardFooter>
                 </Card>
