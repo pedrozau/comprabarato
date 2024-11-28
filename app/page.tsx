@@ -42,13 +42,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Slider } from '@/components/ui/slider';
+import { Slider as UISlider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import dynamic from 'next/dynamic';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { supabase } from '@/lib/supabaseClient';
 import { Skeleton } from '@/components/ui/skeleton';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 const StoreMap = dynamic(() => import('./store-map'), { 
   ssr: false,
@@ -353,7 +356,7 @@ export default function CompraBarat() {
                       Kz {priceRange[0].toLocaleString()} - Kz {priceRange[1].toLocaleString()}
                     </p>
                   </div>
-                  <Slider
+                  <UISlider
                     min={0}
                     max={1500000}
                     step={10000}
@@ -401,11 +404,11 @@ export default function CompraBarat() {
                 </SelectContent>
               </Select>
               <div className="space-y-2">
-                <Label>Faixa de Preço</Label>
+                <Label>Faixa de Preo</Label>
                 <p className="text-sm text-muted-foreground">
                   Kz {priceRange[0].toLocaleString()} - Kz {priceRange[1].toLocaleString()}
                 </p>
-                <Slider
+                <UISlider
                   min={0}
                   max={1500000}
                   step={10000}
@@ -455,16 +458,22 @@ export default function CompraBarat() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-3">
-                    <div className="aspect-square relative mb-2">
-                      <Image
-                        src={product.image_url}
-                        alt={product.name}
-                        layout="fill"
-                        objectFit="cover"
-                        className="rounded-md"
-                      />
-                    </div>
-                    <p className="text-lg font-bold text-orange-600">
+                    <Slider {...{ dots: true, infinite: true, speed: 500, slidesToShow: 1, slidesToScroll: 1 }}>
+                      {product.image_urls.map((url: string, index: number) => (
+                        <div key={index} className="aspect-square relative">
+                          <Image
+                            src={url}
+                            alt={`${product.name} image ${index + 1}`}
+                            layout="fill"
+                            objectFit="contain"
+                            quality={100}
+                            priority={index === 0}
+                            className="rounded-md"
+                          />
+                        </div>
+                      ))}
+                    </Slider>
+                    <p className="text-lg mt-5 font-bold text-orange-600">
                       Kz {product.price.toLocaleString()}
                     </p>
                     <p className="text-xs text-gray-500 flex items-center mt-1">
