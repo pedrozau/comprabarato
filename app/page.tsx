@@ -283,7 +283,7 @@ export default function CompraBarat() {
 
           {/* Menu Desktop */}
           <nav className="hidden md:flex space-x-2">
-            <Button variant="ghost" className="text-blue-500"><Link href="https://lojacomprabarato.vercel.app/login">Login</Link></Button>           
+            <Button variant="ghost" className="text-blue-500"><Link href="https://lojacomprabarato.vercel.app/#login">Login</Link></Button>           
             <Button variant="ghost" className="text-blue-500"><Link href="/faq">FAQ</Link></Button>
             <Button variant="ghost" className="text-blue-500"><Link href="https://lojacomprabarato.vercel.app/register">Registrar Loja</Link></Button>
             <Button variant="ghost" className="text-blue-500"><Link href="/about">Sobre Nós</Link></Button>
@@ -377,7 +377,7 @@ export default function CompraBarat() {
 
         {/* Modal de pesquisa mobile */}
         <Dialog open={isSearchModalOpen} onOpenChange={setIsSearchModalOpen}>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] mb-20">
             <DialogHeader>
               <DialogTitle>Filtros de Pesquisa</DialogTitle>
             </DialogHeader>
