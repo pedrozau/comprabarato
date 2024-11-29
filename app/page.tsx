@@ -480,7 +480,7 @@ export default function CompraBarat() {
                       Kz {product.price.toLocaleString()}
                     </p>
                     <p className="text-xs text-gray-500 flex items-center mt-1">
-                      <MapPin className="mr-1 h-3 w-3" /> {product.distance} km
+                      <MapPin className="mr-1 h-3 w-3" /> {product.distance}
                     </p>
                   </CardContent>
                   <CardFooter className="p-3 flex flex-col gap-2">
