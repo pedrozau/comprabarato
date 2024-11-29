@@ -154,7 +154,10 @@ export default function CompraBarat() {
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return Math.round(R * c); // Distância em km
+    const distanceInKm = R * c; // Distância em km
+    const distanceInMeters = distanceInKm * 1000; // Distância em metros
+
+    return distanceInMeters < 1000 ? `${Math.round(distanceInMeters)} m` : `${Math.round(distanceInKm)} km`;
   };
 
   const productsWithDistance = useMemo(() => {
