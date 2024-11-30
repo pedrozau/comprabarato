@@ -91,6 +91,7 @@ export default function CompraBarat() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -471,7 +472,8 @@ export default function CompraBarat() {
                             objectFit="contain"
                             quality={100}
                             priority={index === 0}
-                            className="rounded-md"
+                            className="rounded-md cursor-pointer"
+                            onClick={() => setSelectedImage(url)}
                           />
                         </div>
                       ))}
@@ -613,6 +615,26 @@ export default function CompraBarat() {
           </div>
         </div>
       </footer>
+
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="sm:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Imagem em Destaque</DialogTitle>
+          </DialogHeader>
+          {selectedImage && (
+            <div className="relative w-full h-[400px]">
+              <Image
+                src={selectedImage}
+                alt="Imagem em destaque"
+                layout="fill"
+                objectFit="contain"
+                quality={100}
+                className="rounded-md"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
