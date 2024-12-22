@@ -20,9 +20,11 @@ interface Store {
 
 interface MapProps {
   stores: Store[];
+  userLocation: number[];
+  setLocation: () => void;
 }
 
-const StoreMap: React.FC<MapProps> = ({ stores }) => {
+const StoreMap: React.FC<MapProps> = ({ stores, userLocation, setLocation }) => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       delete L.Icon.Default.prototype._getIconUrl;
@@ -38,7 +40,7 @@ const StoreMap: React.FC<MapProps> = ({ stores }) => {
     return <div>Loading map...</div>;
   }
 
-  const center = [stores[0].lat, stores[0].lng]; // Center map around the first store
+  const center: [number, number] = [stores[0].lat, stores[0].lng]; // Center map around the first store
 
   return (
     <MapContainer
