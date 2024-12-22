@@ -1,17 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link'
-import {
-  Search,
-  MapPin,
-  Phone,
-  MessageSquare,
-  SlidersHorizontal,
-  Menu,
-  X,
-} from 'lucide-react';
+import { Search, MapPin, Phone, MessageSquare, SlidersHorizontal, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -58,24 +50,28 @@ const StoreMap = dynamic(() => import('./store-map'), {
   loading: () => <p>Carregando mapa...</p>
 });
 
-const generateRandomPrice = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1) + min);
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371e3; // Earth's radius in meters
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in meters
 };
 
-const generateRandomCoordinates = (baseLocation: { lat: number, lng: number }, radiusKm: number) => {
-  const earthRadius = 6371; // raio da Terra em km
-  const maxLat = baseLocation.lat + (radiusKm / earthRadius) * (180 / Math.PI);
-  const minLat = baseLocation.lat - (radiusKm / earthRadius) * (180 / Math.PI);
-  const maxLng = baseLocation.lng + (radiusKm / earthRadius) * (180 / Math.PI) / Math.cos(baseLocation.lat * Math.PI / 180);
-  const minLng = baseLocation.lng - (radiusKm / earthRadius) * (180 / Math.PI) / Math.cos(baseLocation.lat * Math.PI / 180);
-  
-  return {
-    lat: minLat + Math.random() * (maxLat - minLat),
-    lng: minLng + Math.random() * (maxLng - minLng)
-  };
+const formatDistance = (distanceInMeters: number): string => {
+  if (distanceInMeters < 1000) {
+    return `${Math.round(distanceInMeters)} m`;
+  } else {
+    return `${(distanceInMeters / 1000).toFixed(1)} km`;
+  }
 };
-
-
 
 export default function CompraBarat() {
   const [products, setProducts] = useState<any[]>([]);
@@ -90,7 +86,8 @@ export default function CompraBarat() {
   const productsPerPage = 12;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -124,54 +121,54 @@ export default function CompraBarat() {
   }, []);
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.error("Erro ao obter localização do usuário:", error);
-        }
-      );
-    } else {
-      console.error("Geolocalização não é suportada pelo navegador.");
-    }
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.error("Erro ao obter localização do usuário:", error);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 30000,
+        timeout: 27000
+      }
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const toRadians = (degree: number) => (degree * Math.PI) / 180;
+  useEffect(() => {
+    const detectKeyboard = () => {
+      if (window.innerHeight < window.outerHeight) {
+        setIsKeyboardOpen(true);
+      } else {
+        setIsKeyboardOpen(false);
+      }
+    };
 
-    const R = 6371; // Raio da Terra em km
-    const dLat = toRadians(lat2 - lat1);
-    const dLon = toRadians(lon2 - lon1);
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    const distanceInKm = R * c; // Distância em km
-    const distanceInMeters = distanceInKm * 1000; // Distância em metros
-
-    return distanceInMeters < 1000 ? `${Math.round(distanceInMeters)} m` : `${Math.round(distanceInKm)} km`;
-  };
+    window.addEventListener('resize', detectKeyboard);
+    return () => window.removeEventListener('resize', detectKeyboard);
+  }, []);
 
   const productsWithDistance = useMemo(() => {
     if (!userLocation) return products;
 
     return products.map(product => {
-      const distance = calculateDistance(
-        userLocation.lat,
-        userLocation.lon,
+      const distanceInMeters = calculateDistance(
+        userLocation.latitude,
+        userLocation.longitude,
         product.stores.latitude,
         product.stores.longitude
       );
-      return { ...product, distance };
+      return {
+        ...product,
+        distance: formatDistance(distanceInMeters),
+        distanceValue: distanceInMeters
+      };
     });
   }, [products, userLocation]);
 
@@ -187,7 +184,7 @@ export default function CompraBarat() {
       if (sortBy === 'price') {
         return a.price - b.price;
       }
-      return a.distance - b.distance;
+      return a.distanceValue - b.distanceValue;
     });
   }, [productsWithDistance, searchQuery, priceRange, selectedCity, sortBy]);
 
@@ -196,7 +193,7 @@ export default function CompraBarat() {
     setVisibleProducts(initialProducts);
     setPage(1);
     setHasMore(filteredProducts.length > productsPerPage);
-  }, [searchQuery, sortBy, priceRange, selectedCity, filteredProducts, productsPerPage]);
+  }, [searchQuery, sortBy, priceRange, selectedCity, filteredProducts]);
 
   const fetchMoreData = () => {
     const startIndex = visibleProducts.length;
@@ -384,7 +381,9 @@ export default function CompraBarat() {
 
         {/* Modal de pesquisa mobile */}
         <Dialog open={isSearchModalOpen} onOpenChange={setIsSearchModalOpen}>
-          <DialogContent className="sm:max-w-[600px] mb-20">
+          <DialogContent 
+            className={`sm:max-w-[600px] ${isKeyboardOpen ? 'absolute top-0 left-0 right-0' : ''}`}
+          >
             <DialogHeader>
               <DialogTitle>Filtros de Pesquisa</DialogTitle>
             </DialogHeader>
@@ -408,7 +407,7 @@ export default function CompraBarat() {
                 </SelectContent>
               </Select>
               <div className="space-y-2">
-                <Label>Faixa de Preo</Label>
+                <Label>Faixa de Preço</Label>
                 <p className="text-sm text-muted-foreground">
                   Kz {priceRange[0].toLocaleString()} - Kz {priceRange[1].toLocaleString()}
                 </p>
@@ -437,7 +436,7 @@ export default function CompraBarat() {
         {filteredProducts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Image
-              src="/Questions-cuate.svg" // Substitua pelo caminho da sua ilustração
+              src="/Questions-cuate.svg"
               alt="Nenhum produto encontrado"
               width={200}
               height={200}
@@ -510,7 +509,7 @@ export default function CompraBarat() {
                                 address: 'Endereço da loja',
                               },
                             ]}
-                            userLocation={userLocation ? [userLocation.lat, userLocation.lon] : [0, 0]}
+                            userLocation={userLocation ? [userLocation.latitude, userLocation.longitude] : [0, 0]}
                             setLocation={() => {}}
                           />
                         </div>
@@ -638,3 +637,4 @@ export default function CompraBarat() {
     </div>
   );
 }
+
