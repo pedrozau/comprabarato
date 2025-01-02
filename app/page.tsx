@@ -528,7 +528,7 @@ export default function CompraBarat() {
                           <Phone className="h-3 w-3" />
                         </Button>
                       </a>
-                      <a href={`https://wa.me/${product.stores.phone}?text=${encodeURIComponent(whatsappMessageLink(product.stores.name))}`} className="flex-1">
+                      <a href={`https://wa.me/${product.stores.phone}?text=${encodeURIComponent(whatsappMessageLink(product.name))}`} className="flex-1">
                         <Button size="sm" className="w-full text-blue-500 border-blue-500">
                           <MessageSquare className="h-3 w-3" />
                         </Button>
