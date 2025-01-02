@@ -84,7 +84,7 @@ export default function CompraBarat() {
   const [products, setProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('distance');
-  const [priceRange, setPriceRange] = useState([0, 1500000]);
+  const [priceRange, setPriceRange] = useState([0, 9000000]);
   const [selectedCity, setSelectedCity] = useState('Todas');
   const [isLoading, setIsLoading] = useState(true);
   const [visibleProducts, setVisibleProducts] = useState<any[]>([]);
@@ -366,7 +366,7 @@ export default function CompraBarat() {
                   </div>
                   <UISlider
                     min={0}
-                    max={1500000}
+                    max={9000000}
                     step={10000}
                     value={priceRange}
                     onValueChange={setPriceRange}
@@ -420,7 +420,7 @@ export default function CompraBarat() {
                 </p>
                 <UISlider
                   min={0}
-                  max={1500000}
+                  max={9000000}
                   step={10000}
                   value={priceRange}
                   onValueChange={setPriceRange}
