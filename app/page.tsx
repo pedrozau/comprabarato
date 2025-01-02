@@ -65,6 +65,13 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c; // Distance in meters
 };
 
+
+
+const whatsappMessageLink  = (produt: string,) => {
+    return 'Olá! Vi seu produto no Compra Barato, estou interessado em comprar o produto ' + produt + ' e gostaria de saber mais informações.';
+}
+
+
 const formatDistance = (distanceInMeters: number): string => {
   if (distanceInMeters < 1000) {
     return `${Math.round(distanceInMeters)} m`;
@@ -521,7 +528,7 @@ export default function CompraBarat() {
                           <Phone className="h-3 w-3" />
                         </Button>
                       </a>
-                      <a href={`sms:${product.stores.phone}`} className="flex-1">
+                      <a href={`https://wa.me/${product.stores.phone}?text=${encodeURIComponent(whatsappMessageLink(product.stores.name))}`} className="flex-1">
                         <Button size="sm" className="w-full text-blue-500 border-blue-500">
                           <MessageSquare className="h-3 w-3" />
                         </Button>
