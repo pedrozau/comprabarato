@@ -311,7 +311,7 @@ export default function CompraBarat() {
               <Link href="/faq" className="w-full">
                 <Button variant="ghost" className="w-full justify-start text-blue-500">FAQ</Button>
               </Link>
-              <Link href="/store-signup" className="w-full">
+              <Link href="https://loja-comparabarato.vercel.app/register" className="w-full">
                 <Button variant="ghost" className="w-full justify-start text-blue-500">Registrar Loja</Button>
               </Link>
               <Link href="/about" className="w-full">
